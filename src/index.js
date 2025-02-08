@@ -27,7 +27,9 @@ client.on("ready", async (readyClient) => {
 
   readyClient.user.setPresence({
     status: "dnd",
-    activities: [{ type: ActivityType.Custom, name: "Monitoring Clans" }],
+    activities: [
+      { type: ActivityType.Custom, name: "Monitoring Brawl Stars Profile" },
+    ],
   });
 
   new WOK({
