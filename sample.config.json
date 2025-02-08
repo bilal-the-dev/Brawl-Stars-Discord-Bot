@@ -1,0 +1,128 @@
+[
+  {
+    "fameName": "Global fame 1",
+    "shortName": "Global 1",
+    "creditsRequired": 0,
+    "emoji": "🌟"
+  },
+  {
+    "fameName": "Global fame 2",
+    "shortName": "Global 2",
+    "creditsRequired": 2000,
+    "emoji": "🌟🌟"
+  },
+  {
+    "fameName": "Global fame 3",
+    "shortName": "Global 3",
+    "creditsRequired": 4000,
+    "emoji": "🌟🌟🌟"
+  },
+  {
+    "fameName": "Lunar fame 1",
+    "shortName": "Lunar 1",
+    "creditsRequired": 6000,
+    "emoji": "🌟"
+  },
+  {
+    "fameName": "Lunar fame 2",
+    "shortName": "Lunar 2",
+    "creditsRequired": 9200,
+    "emoji": "🌟🌟"
+  },
+  {
+    "fameName": "Lunar fame 3",
+    "shortName": "Lunar 3",
+    "creditsRequired": 12400,
+    "emoji": "🌟🌟🌟"
+  },
+  {
+    "fameName": "Martian fame 1",
+    "shortName": "Martian 1",
+    "creditsRequired": 15600,
+    "emoji": "🌟"
+  },
+  {
+    "fameName": "Martian fame 2",
+    "shortName": "Martian 2",
+    "creditsRequired": 20100,
+    "emoji": "🌟🌟"
+  },
+  {
+    "fameName": "Martian fame 3",
+    "shortName": "Martian 3",
+    "creditsRequired": 24600,
+    "emoji": "🌟🌟🌟"
+  },
+  {
+    "fameName": "Saturnian fame 1",
+    "shortName": "Saturnian 1",
+    "creditsRequired": 29100,
+    "emoji": "🌟"
+  },
+  {
+    "fameName": "Saturnian fame 2",
+    "shortName": "Saturnian 2",
+    "creditsRequired": 37100,
+    "emoji": "🌟🌟"
+  },
+  {
+    "fameName": "Saturnian fame 3",
+    "shortName": "Saturnian 3",
+    "creditsRequired": 45100,
+    "emoji": "🌟🌟🌟"
+  },
+  {
+    "fameName": "Solar fame 1",
+    "shortName": "Solar 1",
+    "creditsRequired": 53100,
+    "emoji": "🌟"
+  },
+  {
+    "fameName": "Solar fame 2",
+    "shortName": "Solar 2",
+    "creditsRequired": 65100,
+    "emoji": "🌟🌟"
+  },
+  {
+    "fameName": "Solar fame 3",
+    "shortName": "Solar 3",
+    "creditsRequired": 77100,
+    "emoji": "🌟🌟🌟"
+  },
+  {
+    "fameName": "Meteoric fame 1",
+    "shortName": "Meteoric 1",
+    "creditsRequired": 89100,
+    "emoji": "🌟"
+  },
+  {
+    "fameName": "Meteoric fame 2",
+    "shortName": "Meteoric 2",
+    "creditsRequired": 109100,
+    "emoji": "🌟🌟"
+  },
+  {
+    "fameName": "Meteoric fame 3",
+    "shortName": "Meteoric 3",
+    "creditsRequired": 129100,
+    "emoji": "🌟🌟🌟"
+  },
+  {
+    "fameName": "Alien fame 1",
+    "shortName": "Alien 1",
+    "creditsRequired": 149100,
+    "emoji": "🌟"
+  },
+  {
+    "fameName": "Alien fame 2",
+    "shortName": "Alien 2",
+    "creditsRequired": 199100,
+    "emoji": "🌟🌟"
+  },
+  {
+    "fameName": "Alien fame 3",
+    "shortName": "Alien 3",
+    "creditsRequired": 249100,
+    "emoji": "🌟🌟🌟"
+  }
+]
