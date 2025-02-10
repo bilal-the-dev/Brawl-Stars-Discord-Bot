@@ -25,9 +25,10 @@ client.on("ready", async (readyClient) => {
 
 
   for(const [_,guild] of client.guilds.cache){
-    await guild.members.fetch().catch(console.error)
+   const members =  await guild.members.fetch().catch(console.error)
+   console.log(`Fetched ${members?.size ?? 0} for guild ${guild.name}`)
   }
-  
+
   await mongoose.connect(MONGO_URI);
 
   readyClient.user.setPresence({

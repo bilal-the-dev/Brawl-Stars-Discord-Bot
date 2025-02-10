@@ -23,7 +23,7 @@ module.exports = {
       let lastFame = null;
 
       for(const user of users){
-        user.member = await interaction.guild.members.fetch(user).catch(console.error)
+        user.member = await interaction.guild.members.fetch(user.userId).catch(console.error)
       }
 
       users.forEach((user, index) => {
