@@ -11,7 +11,7 @@ module.exports = {
     try {
       await interaction.deferReply();
 
-      const users = await Users.find({}).sort({ credits: "descending" });
+      const users = await Users.find({}).sort({ credits: "descending" }).lean()
 
       if (users.length === 0)
         throw new Error(
@@ -21,6 +21,10 @@ module.exports = {
       let description = "Here are the top players sorted by credits!\n\n";
 
       let lastFame = null;
+
+      for(const user of users){
+        user.member = await interaction.guild.members.fetch(user).catch(console.error)
+      }
 
       users.forEach((user, index) => {
         let userDecidedFame = {};
@@ -42,7 +46,7 @@ module.exports = {
             "--------------------------------------------------------------------------\n";
         }
 
-        description += `**${rankDisplay} - <@${userId}>** (#${brawlStarsTag}) (${userDecidedFame.shortName} ${userDecidedFame.emoji}) ${credits}\n`;
+        description += `**${rankDisplay} - ${user.member ? user.member.displayName :  '<@'+ userId +'>'}** (#${brawlStarsTag}) (${userDecidedFame.shortName} ${userDecidedFame.emoji}) ${credits}\n`;
 
         lastFame = userDecidedFame.fameName;
       });

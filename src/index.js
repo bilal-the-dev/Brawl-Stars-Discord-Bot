@@ -23,6 +23,11 @@ client.on("ready", async (readyClient) => {
     `${readyClient.user.username} (${readyClient.user.id}) is running!`
   );
 
+
+  for(const [_,guild] of client.guilds.cache){
+    await guild.members.fetch().catch(console.error)
+  }
+  
   await mongoose.connect(MONGO_URI);
 
   readyClient.user.setPresence({
