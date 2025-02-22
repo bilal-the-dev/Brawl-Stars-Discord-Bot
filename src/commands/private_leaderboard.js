@@ -32,7 +32,7 @@ module.exports = {
           const { username } = fetchedUser;
       console.log(brawlStarsTag);
 
-      const tagExists = await Users.findOne({ brawlStarsTag , userId : useridTag });
+      const tagExists = await Users.findOne({ brawlStarsTag  });
 
       if (tagExists)
         return await interaction.editReply(
