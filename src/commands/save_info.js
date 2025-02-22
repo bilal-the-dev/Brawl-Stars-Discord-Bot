@@ -3,17 +3,19 @@ const { CommandType } = require("wokcommands");
 const { handleInteractionError } = require("../utils/interaction");
 const Users = require("../models/Users");
 const { getBrawtStarsUserInfoByTag } = require("../utils/api");
+const { PermissionFlagsBits } = require("discord.js");
 
 module.exports = {
   description: "Save your profile info for brawl stars!",
   async callback({ interaction }) {
     try {
       const {
-        user: { id: userId },
+        user: { id: userId , username },
       } = interaction;
 
       await interaction.deferReply();
 
+      
       const brawlStarsTag = interaction.options
         .getString("tag")
         .replace("#", "");
@@ -38,6 +40,7 @@ module.exports = {
         { userId },
         {
           userId,
+          username,
           brawlStarsTag,
           brawlStarsUsername: Name,
           trophies: Stats["3"],

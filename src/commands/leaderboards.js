@@ -46,7 +46,7 @@ module.exports = {
             "--------------------------------------------------------------------------\n";
         }
 
-        description += `**${rankDisplay} - ${user.member ? user.member.displayName :  '<@'+ userId +'>'}** (#${brawlStarsTag}) (${userDecidedFame.shortName} ${userDecidedFame.emoji}) ${credits}\n`;
+        description += `**${rankDisplay} - ${user.member ? user.member.displayName :  user.username} ${user.member ? "✅" :  '❌'}** (#${brawlStarsTag}) (${userDecidedFame.shortName} ${userDecidedFame.emoji}) ${credits}\n`;
 
         lastFame = userDecidedFame.fameName;
       });

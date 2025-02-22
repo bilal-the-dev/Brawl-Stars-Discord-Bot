@@ -7,6 +7,7 @@ const defaultZeroNumber = { type: Number, default: 0 };
 const schema = new Schema(
   {
     userId: requiredString,
+    username : requiredString,
     brawlStarsTag: requiredUniqueString,
     brawlStarsUsername: requiredString,
     trophies: defaultZeroNumber,

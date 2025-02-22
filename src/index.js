@@ -15,7 +15,6 @@ const client = new Client({
     IntentsBitField.Flags.MessageContent,
   ],
 });
-
 client.rest.on("rateLimited", console.log);
 
 client.on("ready", async (readyClient) => {
