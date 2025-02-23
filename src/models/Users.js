@@ -1,17 +1,17 @@
 const { Schema, model } = require("mongoose");
 
 const requiredString = { type: String, required: true };
-const requiredUniqueString = { ...requiredString, unique: true };
 const defaultZeroNumber = { type: Number, default: 0 };
 
 const schema = new Schema(
   {
-    userId: requiredString,
-    username : requiredString,
-    brawlStarsTag: requiredUniqueString,
+    userId: String,
+    username: requiredString,
+    brawlStarsTag: requiredString,
     brawlStarsUsername: requiredString,
     trophies: defaultZeroNumber,
     credits: defaultZeroNumber,
+    private: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

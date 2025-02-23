@@ -2,31 +2,33 @@ const { CommandType } = require("wokcommands");
 
 const { handleInteractionError } = require("../utils/interaction");
 const { PermissionFlagsBits } = require("discord.js");
-const { refreshBrawlStarsInfo } = require("../utils/functions");
+const { saveBrawlInfo } = require("../utils/functions");
 
 module.exports = {
-  description: "Refresh all user data",
+  description: "Save your profile info for brawl stars!",
   async callback({ interaction }) {
     try {
-      await refreshBrawlStarsInfo(interaction);
+      await saveBrawlInfo(interaction, true);
     } catch (error) {
       handleInteractionError(interaction, error);
     }
   },
 
   guildOnly: true,
-  type: CommandType.SLASH,
   permissions: [PermissionFlagsBits.Administrator],
+  type: CommandType.SLASH,
   options: [
     {
-      name: "private",
-      description: "whether refresh private data or not",
       type: 3,
+      name: "name",
+      description: "name of user",
       required: true,
-      choices: [
-        { name: "true", value: "true" },
-        { name: "false", value: "false" },
-      ],
+    },
+    {
+      type: 3,
+      name: "tag",
+      description: "your brawl stars tag",
+      required: true,
     },
   ],
 };
