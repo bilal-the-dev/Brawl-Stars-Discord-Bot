@@ -46,8 +46,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
   );
 
   await interaction.editReply({
-    content:
-      "Success! your data has been saved and can be viewed via /leaderboards",
+    content: "Success! your data has been saved!",
   });
 };
 
