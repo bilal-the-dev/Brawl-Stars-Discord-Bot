@@ -19,11 +19,17 @@ exports.getBrawtStarsUserInfoByTag = async (tag) => {
     throw new Error("Something went wrong while fetching user info");
   }
 
-  if (data.state === 1)
+  if (data.state === 1){
+    console.log(res)
+    console.log(data)
     throw new Error("Please double check if the tag is correct!");
+  }
 
-  if (!data.response)
+  if (!data.response){
+    console.log(res)
+    console.log(data)
     throw new Error("Please double check if the tag is correct!");
+  }
 
   return data;
 };
