@@ -1,4 +1,3 @@
-const { PermissionFlagsBits } = require("discord.js");
 const { CommandType } = require("wokcommands");
 
 const { handleInteractionError } = require("../utils/interaction");
@@ -16,5 +15,4 @@ module.exports = {
 
   guildOnly: true,
   type: CommandType.SLASH,
-  permissions: [PermissionFlagsBits.Administrator],
 };

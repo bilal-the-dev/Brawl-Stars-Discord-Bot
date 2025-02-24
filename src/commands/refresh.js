@@ -1,7 +1,6 @@
 const { CommandType } = require("wokcommands");
 
 const { handleInteractionError } = require("../utils/interaction");
-const { PermissionFlagsBits } = require("discord.js");
 const { refreshBrawlStarsInfo } = require("../utils/functions");
 
 module.exports = {
@@ -16,7 +15,6 @@ module.exports = {
 
   guildOnly: true,
   type: CommandType.SLASH,
-  permissions: [PermissionFlagsBits.Administrator],
   options: [
     {
       name: "private",
