@@ -24,8 +24,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
   const data = await getBrawtStarsUserInfoByTag(brawlStarsTag);
 
   const {
-    response: { Stats },
-    Name,
+    response: { Stats, Name },
   } = data;
 
   let queryData = { brawlStarsTag };
@@ -86,11 +85,12 @@ exports.refreshBrawlStarsInfo = async (interaction) => {
       const data = await getBrawtStarsUserInfoByTag(user.brawlStarsTag);
 
       const {
-        response: { Stats },
+        response: { Stats, Name },
       } = data;
 
       await user.updateOne({
         trophies: Stats["3"],
+        brawlStarsUsername: Name,
         credits: Stats["20"],
       });
 
@@ -104,9 +104,8 @@ exports.refreshBrawlStarsInfo = async (interaction) => {
     } catch (error) {
       console.log(error);
 
-      // if (user.userId) failedUsers.push("<@" + user.userId + ">");
-      // else
-      failedUsers.push(user.username);
+      if (user.userId) failedUsers.push("<@" + user.userId + ">");
+      else failedUsers.push(user.username);
     }
   }
 

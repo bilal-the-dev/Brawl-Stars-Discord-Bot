@@ -27,9 +27,9 @@ client.on("ready", async (readyClient) => {
     `${readyClient.user.username} (${readyClient.user.id}) is running!`
   );
 
-  const guild = client.guilds.cache.get(GUILD_ID);
-  const members = await guild.members.fetch().catch(console.error);
-  console.log(`Fetched ${members?.size ?? 0} for guild ${guild.name}`);
+  // const guild = client.guilds.cache.get(GUILD_ID);
+  // const members = await guild.members.fetch().catch(console.error);
+  // console.log(`Fetched ${members?.size ?? 0} for guild ${guild.name}`);
 
   CronJob.from({
     cronTime: "0 50 23 * * *",
