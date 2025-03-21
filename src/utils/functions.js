@@ -10,6 +10,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
 
   const brawlStarsTag = options.getString("tag").replace("#", "");
   const name = options.getString("name");
+  const superCellId = options.getString("supercell_id");
 
   // since public info is similar to private now, i think no need to validate anymore?
   // if (!isPrivate) {
@@ -29,6 +30,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
 
   await Users.create({
     username: name,
+    superCellId,
     private: isPrivate,
     brawlStarsTag,
     brawlStarsUsername: Name,
@@ -168,7 +170,7 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
 
     description += `**${rankDisplay} - ${
       user.member ? user.member.displayName : user.username
-    }** ${isPrivate ? isPrivateMemberInServer : ""} (#${brawlStarsTag}) (${
+    }** ${isPrivate ? isPrivateMemberInServer : ""} ${user.superCellId ? `(${user.superCellId}) ` : ""}(#${brawlStarsTag}) (${
       userDecidedFame.shortName
     } ${userDecidedFame.emoji}) ${credits}\n`;
 

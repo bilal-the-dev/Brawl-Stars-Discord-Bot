@@ -7,6 +7,7 @@ const schema = new Schema(
   {
     // userId: String,
     username: requiredString,
+    superCellId: String,
     brawlStarsTag: requiredString,
     brawlStarsUsername: requiredString,
     trophies: defaultZeroNumber,

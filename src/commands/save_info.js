@@ -24,6 +24,12 @@ module.exports = {
     },
     {
       type: 3,
+      name: "supercell_id",
+      description: "supercell_id of user",
+      required: true,
+    },
+    {
+      type: 3,
       name: "tag",
       description: "your brawl stars tag",
       required: true,
