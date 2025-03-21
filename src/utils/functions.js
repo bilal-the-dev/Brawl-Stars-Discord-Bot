@@ -27,22 +27,14 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
     response: { Stats, Name },
   } = data;
 
-  let queryData = { brawlStarsTag };
-
-  if (isPrivate) queryData.private = true;
-
-  await Users.findOneAndUpdate(
-    queryData,
-    {
-      username: name,
-      private: isPrivate,
-      brawlStarsTag,
-      brawlStarsUsername: Name,
-      trophies: Stats["3"],
-      credits: Stats["20"],
-    },
-    { upsert: true }
-  );
+  await Users.create({
+    username: name,
+    private: isPrivate,
+    brawlStarsTag,
+    brawlStarsUsername: Name,
+    trophies: Stats["3"],
+    credits: Stats["20"],
+  });
 
   await interaction.editReply({
     content: "Success! your data has been saved!",
@@ -137,11 +129,11 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
 
   let lastFame = null;
 
-  // for (const user of users) {
-  //   if (user.userId)
-  //     // they dont have user id for private so this "if" will never happen
-  //     user.member = await guild.members.fetch(user.userId).catch(console.error);
-  // }
+  for (const user of users) {
+    if (user.userId)
+      // they dont have user id for private so this "if" will never happen
+      user.member = await guild.members.fetch(user.userId).catch(console.error);
+  }
 
   for (const [index, user] of users.entries()) {
     let userDecidedFame = {};
@@ -175,7 +167,7 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
     }
 
     description += `**${rankDisplay} - ${
-      user.username
+      user.member ? user.member.displayName : user.username
     }** ${isPrivate ? isPrivateMemberInServer : ""} (#${brawlStarsTag}) (${
       userDecidedFame.shortName
     } ${userDecidedFame.emoji}) ${credits}\n`;
