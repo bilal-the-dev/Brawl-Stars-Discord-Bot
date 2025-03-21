@@ -28,16 +28,29 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
     response: { Stats, Name },
   } = data;
 
-  await Users.create({
-    username: name,
-    superCellId,
-    private: isPrivate,
+  const query = {
     brawlStarsTag,
-    brawlStarsUsername: Name,
-    trophies: Stats["3"],
-    credits: Stats["20"],
-  });
+    $or: [{ private: false }, { private: undefined }],
+  };
 
+  if (isPrivate) {
+    query["$or"] = undefined;
+    query.private = true;
+  }
+
+  await Users.findOneAndUpdate(
+    query,
+    {
+      username: name,
+      superCellId,
+      private: isPrivate,
+      brawlStarsTag,
+      brawlStarsUsername: Name,
+      trophies: Stats["3"],
+      credits: Stats["20"],
+    },
+    { upsert: true }
+  );
   await interaction.editReply({
     content: "Success! your data has been saved!",
   });
@@ -170,7 +183,7 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
 
     description += `**${rankDisplay} - ${
       user.member ? user.member.displayName : user.username
-    }** ${isPrivate ? isPrivateMemberInServer : ""} ${user.superCellId ? `(${user.superCellId}) ` : ""}(#${brawlStarsTag}) (${
+    }** ${isPrivate ? isPrivateMemberInServer : ""} ${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
       userDecidedFame.shortName
     } ${userDecidedFame.emoji}) ${credits}\n`;
 
