@@ -6,19 +6,20 @@ const { EmbedBuilder } = require("discord.js");
 exports.saveBrawlInfo = async (interaction, isPrivate) => {
   await interaction.deferReply();
 
-  const { user, options } = interaction;
+  const { options } = interaction;
 
   const brawlStarsTag = options.getString("tag").replace("#", "");
   const name = options.getString("name");
 
-  if (!isPrivate) {
-    const tagExists = await Users.findOne({ brawlStarsTag, private: false });
+  // since public info is similar to private now, i think no need to validate anymore?
+  // if (!isPrivate) {
+  //   const tagExists = await Users.findOne({ brawlStarsTag, private: false });
 
-    if (tagExists)
-      return await interaction.editReply(
-        `User <@${tagExists.userId}> has already claimed the tag 😔`
-      );
-  }
+  //   if (tagExists)
+  //     return await interaction.editReply(
+  //       `User <@${tagExists.userId}> has already claimed the tag 😔`
+  //     );
+  // }
 
   const data = await getBrawtStarsUserInfoByTag(brawlStarsTag);
 
@@ -27,15 +28,14 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
     Name,
   } = data;
 
-  let queryData = { userId: user.id };
+  let queryData = { brawlStarsTag };
 
-  if (isPrivate) queryData = { brawlStarsTag, private: true };
+  if (isPrivate) queryData.private = true;
 
   await Users.findOneAndUpdate(
     queryData,
     {
-      ...queryData,
-      username: isPrivate ? name : user.username,
+      username: name,
       private: isPrivate,
       brawlStarsTag,
       brawlStarsUsername: Name,
@@ -104,8 +104,9 @@ exports.refreshBrawlStarsInfo = async (interaction) => {
     } catch (error) {
       console.log(error);
 
-      if (user.userId) failedUsers.push("<@" + user.userId + ">");
-      else failedUsers.push(user.username);
+      // if (user.userId) failedUsers.push("<@" + user.userId + ">");
+      // else
+      failedUsers.push(user.username);
     }
   }
 
@@ -137,11 +138,11 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
 
   let lastFame = null;
 
-  for (const user of users) {
-    if (user.userId)
-      // they dont have user id for private so this "if" will never happen
-      user.member = await guild.members.fetch(user.userId).catch(console.error);
-  }
+  // for (const user of users) {
+  //   if (user.userId)
+  //     // they dont have user id for private so this "if" will never happen
+  //     user.member = await guild.members.fetch(user.userId).catch(console.error);
+  // }
 
   for (const [index, user] of users.entries()) {
     let userDecidedFame = {};
@@ -175,7 +176,7 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
     }
 
     description += `**${rankDisplay} - ${
-      user.member ? user.member.displayName : user.username
+      user.username
     }** ${isPrivate ? isPrivateMemberInServer : ""} (#${brawlStarsTag}) (${
       userDecidedFame.shortName
     } ${userDecidedFame.emoji}) ${credits}\n`;

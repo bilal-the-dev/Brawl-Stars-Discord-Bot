@@ -5,7 +5,7 @@ const defaultZeroNumber = { type: Number, default: 0 };
 
 const schema = new Schema(
   {
-    userId: String,
+    // userId: String,
     username: requiredString,
     brawlStarsTag: requiredString,
     brawlStarsUsername: requiredString,

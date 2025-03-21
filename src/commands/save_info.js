@@ -18,6 +18,12 @@ module.exports = {
   options: [
     {
       type: 3,
+      name: "name",
+      description: "name of user",
+      required: true,
+    },
+    {
+      type: 3,
       name: "tag",
       description: "your brawl stars tag",
       required: true,
