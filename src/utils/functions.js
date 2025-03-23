@@ -34,7 +34,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
   };
 
   if (isPrivate) {
-    query["$or"] = undefined;
+    delete query["$or"];
     query.private = true;
   }
 
@@ -159,7 +159,7 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
     else if (index === 2) rankDisplay = "🥉";
     else rankDisplay = `#${index + 1}`;
 
-    const { credits, brawlStarsTag } = user;
+    const { credits, brawlStarsTag, markType } = user;
 
     for (const fame of config) {
       if (credits > fame.creditsRequired) userDecidedFame = fame;
@@ -173,12 +173,18 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
     let isPrivateMemberInServer = "❌";
 
     if (isPrivate) {
-      const d = await Users.findOne({
-        brawlStarsTag,
-        $or: [{ private: false }, { private: undefined }],
-      });
+      if (!markType) {
+        const d = await Users.findOne({
+          brawlStarsTag,
+          $or: [{ private: false }, { private: undefined }],
+        });
 
-      if (d) isPrivateMemberInServer = "✅";
+        if (d) isPrivateMemberInServer = "✅";
+      }
+
+      if (markType) {
+        isPrivateMemberInServer = markType === "tick" ? "✅" : "❌";
+      }
     }
 
     description += `**${rankDisplay} - ${

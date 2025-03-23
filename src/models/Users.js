@@ -13,6 +13,7 @@ const schema = new Schema(
     trophies: defaultZeroNumber,
     credits: defaultZeroNumber,
     private: { type: Boolean, default: false },
+    markType: String,
   },
   { timestamps: true }
 );
