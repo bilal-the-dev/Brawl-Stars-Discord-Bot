@@ -140,7 +140,10 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
   if (users.length === 0)
     throw new Error("No user found in database, start saving your info.");
 
-  let description = "Here are the top players sorted by credits!\n\n";
+  const content = "Here are the top players sorted by credits!\n\n";
+
+  let description = "";
+  const embeds = [];
 
   let lastFame = null;
 
@@ -194,17 +197,31 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
     } ${userDecidedFame.emoji}) ${credits}\n`;
 
     lastFame = userDecidedFame.fameName;
+
+    // make dynamic embeds to avoid 4096 max desc length
+    if (description.length >= 3900) {
+      const embed = new EmbedBuilder()
+        .setTitle("🏆 Brawl Stars Leaderboard")
+        .setColor("#FFD700")
+        .setDescription(description)
+        .setThumbnail(
+          "https://static.vecteezy.com/system/resources/previews/027/127/543/non_2x/brawl-stars-logo-brawl-stars-icon-transparent-free-png.png"
+        );
+
+      embeds.push(embed);
+      description = "";
+    }
   }
 
-  const embed = new EmbedBuilder()
-    .setTitle("🏆 Brawl Stars Leaderboard")
-    .setColor("#FFD700")
-    .setDescription(description)
-    .setThumbnail(
-      "https://static.vecteezy.com/system/resources/previews/027/127/543/non_2x/brawl-stars-logo-brawl-stars-icon-transparent-free-png.png"
-    );
+  if (interaction) {
+    await interaction.editReply({ content, embeds: [embeds[0]] });
 
-  if (interaction) await interaction.editReply({ embeds: [embed] });
+    if (embeds.length > 1) {
+      for (const embed of embeds.slice(1)) {
+        await interaction.channel.send(embed);
+      }
+    }
+  }
 
-  return embed;
+  return embeds;
 };

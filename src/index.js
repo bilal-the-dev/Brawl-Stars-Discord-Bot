@@ -39,11 +39,11 @@ client.on("ready", async (readyClient) => {
         await refreshBrawlStarsInfo();
         const guild = client.guilds.cache.get(GUILD_ID);
 
-        const embed = await generateLeaderboardData(guild);
+        const embeds = await generateLeaderboardData(guild);
 
         const channel = client.channels.cache.get(LEADERBOARD_CHANNEL_ID);
 
-        await channel.send({ embeds: [embed] });
+        for (const embed of embeds) await channel.send({ embeds: [embed] });
       } catch (error) {
         console.log(error);
       }
