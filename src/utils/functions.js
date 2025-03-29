@@ -216,9 +216,9 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
   if (interaction) {
     await interaction.editReply({ content, embeds: [embeds[0]] });
 
-    if (embeds.length > 1) {
+    if (embeds.length >= 1) {
       for (const embed of embeds.slice(1)) {
-        await interaction.channel.send(embed);
+        await interaction.channel.send({ embeds: [embed] });
       }
     }
   }
