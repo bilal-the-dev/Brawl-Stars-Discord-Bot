@@ -39,7 +39,7 @@ client.on("ready", async (readyClient) => {
         await refreshBrawlStarsInfo();
         const guild = client.guilds.cache.get(GUILD_ID);
 
-        const embeds = await generateLeaderboardData(guild);
+        const embeds = await generateLeaderboardData(guild, null, false);
 
         const channel = client.channels.cache.get(LEADERBOARD_CHANNEL_ID);
 
