@@ -199,7 +199,7 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
     lastFame = userDecidedFame.fameName;
 
     // make dynamic embeds to avoid 4096 max desc length
-    if (description.length >= 3900) {
+    if (description.length >= 3900 || index === users.length - 1) {
       const embed = new EmbedBuilder()
         .setTitle("🏆 Brawl Stars Leaderboard")
         .setColor("#FFD700")
