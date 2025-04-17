@@ -38,7 +38,9 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
     query.private = true;
   }
 
-  await Users.findOneAndUpdate(
+  const oldDoc = await Users.findOne(query);
+
+  const userDoc = await Users.findOneAndUpdate(
     query,
     {
       username: name,
@@ -49,8 +51,17 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
       trophies: Stats["3"],
       credits: Stats["20"],
     },
-    { upsert: true }
+    { upsert: true, new: true }
   );
+
+  if (!oldDoc) {
+    console.log("New user created with credits:", Stats["20"]);
+
+    await userDoc.updateOne({
+      oldCredits: Stats["20"],
+      newRefreshedCredits: Stats["20"],
+    });
+  }
   await interaction.editReply({
     content: "Success! your data has been saved!",
   });
@@ -254,7 +265,7 @@ exports.parseUserInfoToStr = async ({
   if (newCredits) {
     const diff = user.newRefreshedCredits - user.oldCredits;
 
-    creditsChange = `${diff >= 0 ? "📈" : "📉"} ${diff} :Credits:`;
+    creditsChange = `${diff >= 0 ? "📈" : "📉"} ${diff} <:Credits:1355573284149661866>`;
   }
 
   description += `**${rankDisplay} - ${
