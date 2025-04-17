@@ -4,21 +4,21 @@ const { handleInteractionError } = require("../utils/interaction");
 const Users = require("../models/Users");
 
 module.exports = {
-  description: "Add mark!",
+  description: "Add flag!",
   async callback({ interaction }) {
     try {
       await interaction.deferReply();
 
       const { options } = interaction;
       const brawlStarsTag = options.getString("tag").replace("#", "");
-      const type = options.getString("type");
+      const flag = options.getString("flag");
 
       const query = {
         brawlStarsTag,
-        private: true,
+        $or: [{ private: false }, { private: undefined }],
       };
 
-      const r = await Users.findOneAndUpdate(query, { markType: type });
+      const r = await Users.findOneAndUpdate(query, { flag });
 
       if (!r) throw new Error("Could not find anyone matching that tag!");
 
@@ -38,14 +38,10 @@ module.exports = {
       required: true,
     },
     {
-      name: "type",
-      description: "type of mark",
+      name: "flag",
+      description: "flag want to add",
       type: 3,
       required: true,
-      choices: [
-        { name: "✅", value: "tick" },
-        { name: "❌", value: "cross" },
-      ],
     },
   ],
 };

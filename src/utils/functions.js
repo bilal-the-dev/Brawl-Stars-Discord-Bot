@@ -56,7 +56,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
   });
 };
 
-exports.refreshBrawlStarsInfo = async (interaction) => {
+exports.refreshBrawlStarsInfo = async ({ interaction } = {}) => {
   if (interaction)
     await interaction.reply(
       "Refreshing... Will send a message when completed! Takes 10 seconds approx for each user."
@@ -162,7 +162,7 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
     else if (index === 2) rankDisplay = "🥉";
     else rankDisplay = `#${index + 1}`;
 
-    const { credits, brawlStarsTag, markType } = user;
+    const { credits, brawlStarsTag, markType, flag } = user;
 
     for (const fame of config) {
       if (credits > fame.creditsRequired) userDecidedFame = fame;
@@ -192,7 +192,7 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
 
     description += `**${rankDisplay} - ${
       user.member ? user.member.displayName : user.username
-    }** ${isPrivate ? isPrivateMemberInServer : ""} ${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
+    }** ${isPrivate ? isPrivateMemberInServer : ""}${flag ?? ""}${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
       userDecidedFame.shortName
     } ${userDecidedFame.emoji}) ${credits}\n`;
 

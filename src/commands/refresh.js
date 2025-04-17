@@ -7,7 +7,7 @@ module.exports = {
   description: "Refresh all user data",
   async callback({ interaction }) {
     try {
-      await refreshBrawlStarsInfo(interaction);
+      await refreshBrawlStarsInfo({ interaction });
     } catch (error) {
       handleInteractionError(interaction, error);
     }
