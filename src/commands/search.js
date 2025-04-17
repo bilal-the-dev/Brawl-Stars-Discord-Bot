@@ -3,7 +3,7 @@ const { CommandType } = require("wokcommands");
 const { handleInteractionError } = require("../utils/interaction");
 const Users = require("../models/Users");
 const { parseUserInfoToStr } = require("../utils/functions");
-const { EmbedBuilder } = require("@discordjs/builders");
+const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
   description: "Search with tag!",
