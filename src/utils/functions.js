@@ -154,49 +154,17 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
   }
 
   for (const [index, user] of users.entries()) {
-    let userDecidedFame = {};
-    let rankDisplay;
+    const { userDescription, newLastFame } = await this.parseUserInfoToStr({
+      user,
+      postion: index + 1,
+      description,
+      isPrivate,
+      lastFame,
+    });
 
-    if (index === 0) rankDisplay = "🥇";
-    else if (index === 1) rankDisplay = "🥈";
-    else if (index === 2) rankDisplay = "🥉";
-    else rankDisplay = `#${index + 1}`;
+    lastFame = newLastFame;
 
-    const { credits, brawlStarsTag, markType, flag } = user;
-
-    for (const fame of config) {
-      if (credits > fame.creditsRequired) userDecidedFame = fame;
-    }
-
-    if (lastFame && lastFame !== userDecidedFame.fameName) {
-      description +=
-        "--------------------------------------------------------------------------\n";
-    }
-
-    let isPrivateMemberInServer = "❌";
-
-    if (isPrivate) {
-      if (!markType) {
-        const d = await Users.findOne({
-          brawlStarsTag,
-          $or: [{ private: false }, { private: undefined }],
-        });
-
-        if (d) isPrivateMemberInServer = "✅";
-      }
-
-      if (markType) {
-        isPrivateMemberInServer = markType === "tick" ? "✅" : "❌";
-      }
-    }
-
-    description += `**${rankDisplay} - ${
-      user.member ? user.member.displayName : user.username
-    }** ${isPrivate ? isPrivateMemberInServer : ""}${flag ?? ""}${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
-      userDecidedFame.shortName
-    } ${userDecidedFame.emoji}) ${credits}\n`;
-
-    lastFame = userDecidedFame.fameName;
+    description += userDescription;
 
     // make dynamic embeds to avoid 4096 max desc length
     if (
@@ -227,4 +195,56 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
   }
 
   return embeds;
+};
+
+exports.parseUserInfoToStr = async ({
+  user,
+  description,
+  postion,
+  lastFame,
+  isPrivate,
+}) => {
+  let userDecidedFame = {};
+  let rankDisplay;
+
+  if (postion === 1) rankDisplay = "🥇";
+  else if (postion === 2) rankDisplay = "🥈";
+  else if (postion === 3) rankDisplay = "🥉";
+  else rankDisplay = `#${postion}`;
+
+  const { credits, brawlStarsTag, markType, flag } = user;
+
+  for (const fame of config) {
+    if (credits > fame.creditsRequired) userDecidedFame = fame;
+  }
+
+  if (lastFame && lastFame !== userDecidedFame.fameName) {
+    description +=
+      "--------------------------------------------------------------------------\n";
+  }
+
+  let isPrivateMemberInServer = "❌";
+
+  if (isPrivate) {
+    if (!markType) {
+      const d = await Users.findOne({
+        brawlStarsTag,
+        $or: [{ private: false }, { private: undefined }],
+      });
+
+      if (d) isPrivateMemberInServer = "✅";
+    }
+
+    if (markType) {
+      isPrivateMemberInServer = markType === "tick" ? "✅" : "❌";
+    }
+  }
+
+  description += `**${rankDisplay} - ${
+    user.member ? user.member.displayName : user.username
+  }** ${isPrivate ? isPrivateMemberInServer : ""}${flag ?? ""}${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
+    userDecidedFame.shortName
+  } ${userDecidedFame.emoji}) ${credits}\n`;
+
+  return { description, newLastFame: userDecidedFame.fameName };
 };
