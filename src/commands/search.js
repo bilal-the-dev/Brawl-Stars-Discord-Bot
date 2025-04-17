@@ -28,9 +28,18 @@ module.exports = {
 
       if (userPos === -1) throw new Error("Could not find you in database!");
 
+      const user = docs[userPos];
+
+      if (user.userId)
+        // they dont have user id for private so this "if" will never happen
+        user.member = await interaction.guild.members
+          .fetch(user.userId)
+          .catch(console.error);
+
       const { userDescription } = await parseUserInfoToStr({
-        user: docs[userPos],
+        user,
         postion: userPos + 1,
+        description: "",
       });
 
       const embed = new EmbedBuilder()
