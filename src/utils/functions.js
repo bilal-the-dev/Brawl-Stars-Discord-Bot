@@ -265,7 +265,7 @@ exports.parseUserInfoToStr = async ({
   if (newCredits) {
     const diff = user.newRefreshedCredits - user.oldCredits;
 
-    creditsChange = `${diff >= 0 ? "📈" : "📉"} ${diff} <:Credits:1355573284149661866>`;
+    creditsChange = `${diff >= 0 ? "📈" : "📉"} ${Math.abs(diff)} <:Credits:1355573284149661866>`;
   }
 
   description += `**${rankDisplay} - ${
