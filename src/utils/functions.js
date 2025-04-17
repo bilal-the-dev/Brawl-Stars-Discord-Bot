@@ -56,7 +56,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
   });
 };
 
-exports.refreshBrawlStarsInfo = async ({ interaction } = {}) => {
+exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
   if (interaction)
     await interaction.reply(
       "Refreshing... Will send a message when completed! Takes 10 seconds approx for each user."
@@ -99,6 +99,8 @@ exports.refreshBrawlStarsInfo = async ({ interaction } = {}) => {
         trophies: Stats["3"],
         brawlStarsUsername: Name,
         credits: Stats["20"],
+        ...(dailyRefresh && { oldCredits: user.newRefreshedCredits }),
+        ...(dailyRefresh && { newRefreshedCredits: Stats["20"] }),
       });
 
       successfulUserCount++;
@@ -124,7 +126,12 @@ exports.refreshBrawlStarsInfo = async ({ interaction } = {}) => {
     );
 };
 
-exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
+exports.generateLeaderboardData = async (
+  guild,
+  interaction,
+  isPrivate,
+  newCredits
+) => {
   if (interaction) await interaction.deferReply();
 
   let secondIsPrivate = isPrivate;
@@ -160,6 +167,7 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
       description,
       isPrivate,
       lastFame,
+      newCredits,
     });
 
     lastFame = newLastFame;
@@ -203,6 +211,7 @@ exports.parseUserInfoToStr = async ({
   postion,
   lastFame,
   isPrivate,
+  newCredits,
 }) => {
   let userDecidedFame = {};
   let rankDisplay;
@@ -240,9 +249,17 @@ exports.parseUserInfoToStr = async ({
     }
   }
 
+  let creditsChange;
+
+  if (newCredits) {
+    const diff = user.newRefreshedCredits - user.oldCredits;
+
+    creditsChange = `${diff >= 0 ? "📈" : "📉"} ${diff} :Credits:`;
+  }
+
   description += `**${rankDisplay} - ${
     user.member ? user.member.displayName : user.username
-  }** ${isPrivate ? isPrivateMemberInServer : ""}${flag ?? ""}${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
+  }** ${isPrivate ? isPrivateMemberInServer : ""}${!newCredits ? (flag ?? "") : ""}${newCredits ? creditsChange : ""} ${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
     userDecidedFame.shortName
   } ${userDecidedFame.emoji}) ${credits}\n`;
 

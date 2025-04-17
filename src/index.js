@@ -36,7 +36,7 @@ client.on("ready", async (readyClient) => {
     onTick: async function () {
       try {
         console.log("Running leaderboard time");
-        await refreshBrawlStarsInfo();
+        await refreshBrawlStarsInfo({ dailyRefresh: true });
         const guild = client.guilds.cache.get(GUILD_ID);
 
         const embeds = await generateLeaderboardData(guild, null, false);
