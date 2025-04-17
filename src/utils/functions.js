@@ -164,7 +164,7 @@ exports.generateLeaderboardData = async (guild, interaction, isPrivate) => {
 
     lastFame = newLastFame;
 
-    description += userDescription;
+    description = userDescription;
 
     // make dynamic embeds to avoid 4096 max desc length
     if (
