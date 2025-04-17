@@ -24,7 +24,7 @@ module.exports = {
 
       if (docs.length === 0) throw new Error("No data found in database!");
 
-      const userPos = docs.find((d) => d.brawlStarsTag === brawlStarsTag);
+      const userPos = docs.findIndex((d) => d.brawlStarsTag === brawlStarsTag);
 
       if (userPos === -1) throw new Error("Could not find you in database!");
 
