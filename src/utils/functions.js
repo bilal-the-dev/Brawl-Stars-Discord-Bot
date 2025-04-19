@@ -99,44 +99,48 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
 
   let successfulUserCount = 0;
 
-  for (const user of users) {
-    try {
-      const data = await getBrawtStarsUserInfoByTag(user.brawlStarsTag);
+  const result = await refreshUsersBatch(users, dailyRefresh);
 
-      const {
-        response: { Stats, Name, Alliance },
-      } = data;
+  if (interaction) {
+    const {
+      ActionRowBuilder,
+      ButtonBuilder,
+      ButtonStyle,
+    } = require("discord.js");
 
-      await user.updateOne({
-        trophies: Stats["3"],
-        brawlStarsUsername: Name,
-        credits: Stats["20"],
-        ...(dailyRefresh && { oldCredits: user.newRefreshedCredits }),
-        ...(dailyRefresh && { newRefreshedCredits: Stats["20"] }),
-        allianceLocation: Alliance?.RegionName,
-      });
-
-      successfulUserCount++;
-
-      await new Promise((res) =>
-        setTimeout(() => {
-          res();
-        }, 1000 * 10)
-      );
-    } catch (error) {
-      console.log(error);
-
-      if (user.userId) failedUsers.push("<@" + user.userId + ">");
-      else failedUsers.push(user.username);
-    }
-  }
-
-  if (interaction)
-    await interaction.channel.send(
-      `Refreshed data for ${successfulUserCount} users , failed users: ${
-        failedUsers.join(", ") || "None"
-      }`
+    const row = new ActionRowBuilder().addComponents(
+      new ButtonBuilder()
+        .setCustomId("refresh_failed")
+        .setLabel(`Refresh Failed Users (${result.failedUsers.length})`)
+        .setStyle(ButtonStyle.Primary)
+        .setDisabled(result.failedUsers.length === 0)
     );
+
+    const m = await interaction.channel.send({
+      content: `Refreshed data for ${successfulUserCount} users, failed users: ${
+        failedUsers.join(", ") || "None"
+      }`,
+      components: [row],
+    });
+
+    const collector = m.createMessageComponentCollector({
+      filter: (i) =>
+        i.customId === "refresh_failed" && i.user.id === interaction.user.id,
+      time: 1000 * 60 * 3,
+    });
+
+    collector.on("collect", async (i) => {
+      await i.update({ components: [] });
+
+      const retryResult = await refreshUsersBatch(failedUsers, dailyRefresh);
+
+      await i.channel.send({
+        content: `Retried ${failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
+          retryResult.failedUsers.join(", ") || "None"
+        }`,
+      });
+    });
+  }
 };
 
 exports.generateLeaderboardData = async (
@@ -287,3 +291,41 @@ exports.parseUserInfoToStr = async ({
     newLastFame: userDecidedFame.fameName,
   };
 };
+
+async function refreshUsersBatch(users, dailyRefresh = false) {
+  let failedUsers = [];
+  let failedUserNames = [];
+  let successfulCount = 0;
+
+  for (const user of users) {
+    try {
+      const data = await getBrawtStarsUserInfoByTag(user.brawlStarsTag);
+      const {
+        response: { Stats, Name, Alliance },
+      } = data;
+
+      await user.updateOne({
+        trophies: Stats["3"],
+        brawlStarsUsername: Name,
+        credits: Stats["20"],
+        ...(dailyRefresh && { oldCredits: user.newRefreshedCredits }),
+        ...(dailyRefresh && { newRefreshedCredits: Stats["20"] }),
+        allianceLocation: Alliance?.RegionName,
+      });
+
+      successfulCount++;
+
+      await new Promise((res) => setTimeout(res, 1000 * 10));
+    } catch (error) {
+      console.log(error);
+      failedUsers.push(user);
+      failedUserNames.push(user.userId ? `<@${user.userId}>` : user.username);
+    }
+  }
+
+  return {
+    successfulCount,
+    failedUsers,
+    failedUserNames,
+  };
+}
