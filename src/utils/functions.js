@@ -25,7 +25,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
   const data = await getBrawtStarsUserInfoByTag(brawlStarsTag);
 
   const {
-    response: { Stats, Name },
+    response: { Stats, Name, Alliance },
   } = data;
 
   const query = {
@@ -50,6 +50,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
       brawlStarsUsername: Name,
       trophies: Stats["3"],
       credits: Stats["20"],
+      allianceLocation: Alliance?.RegionName,
     },
     { upsert: true, new: true }
   );
@@ -103,7 +104,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
       const data = await getBrawtStarsUserInfoByTag(user.brawlStarsTag);
 
       const {
-        response: { Stats, Name },
+        response: { Stats, Name, Alliance },
       } = data;
 
       await user.updateOne({
@@ -112,6 +113,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
         credits: Stats["20"],
         ...(dailyRefresh && { oldCredits: user.newRefreshedCredits }),
         ...(dailyRefresh && { newRefreshedCredits: Stats["20"] }),
+        allianceLocation: Alliance?.RegionName,
       });
 
       successfulUserCount++;

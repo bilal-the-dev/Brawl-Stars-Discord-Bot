@@ -15,6 +15,7 @@ const schema = new Schema(
     flag: String,
     oldCredits: defaultZeroNumber,
     newRefreshedCredits: defaultZeroNumber,
+    allianceLocation: String,
     private: { type: Boolean, default: false },
     markType: String,
   },
