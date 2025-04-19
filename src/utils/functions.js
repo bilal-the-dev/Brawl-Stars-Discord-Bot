@@ -1,7 +1,12 @@
+const {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  EmbedBuilder,
+} = require("discord.js");
 const Users = require("../models/Users");
 const { getBrawtStarsUserInfoByTag } = require("./api");
 const config = require("./../../config.json");
-const { EmbedBuilder } = require("discord.js");
 
 exports.saveBrawlInfo = async (interaction, isPrivate) => {
   await interaction.deferReply();
@@ -102,12 +107,6 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
   const result = await refreshUsersBatch(users, dailyRefresh);
 
   if (interaction) {
-    const {
-      ActionRowBuilder,
-      ButtonBuilder,
-      ButtonStyle,
-    } = require("discord.js");
-
     const row = new ActionRowBuilder().addComponents(
       new ButtonBuilder()
         .setCustomId("refresh_failed")
@@ -280,11 +279,19 @@ exports.parseUserInfoToStr = async ({
     creditsChange = `${diff >= 0 ? "📈" : "📉"} ${Math.abs(diff)} <:Credits:1355573284149661866>`;
   }
 
-  description += `**${rankDisplay} - ${
-    user.member ? user.member.displayName : user.username
-  }** ${isPrivate ? isPrivateMemberInServer : ""}${!newCredits ? flagEmoji : ""}${newCredits ? creditsChange : ""} ${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
-    userDecidedFame.shortName
-  } ${userDecidedFame.emoji}) ${credits}${!newCredits ? " <:Credits:1355573284149661866>" : ""}\n`;
+  if (!newCredits) {
+    description += `**${rankDisplay} - ${
+      user.member ? user.member.displayName : user.username
+    }** ${isPrivate ? isPrivateMemberInServer : ""}${flagEmoji ?? ""} ${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
+      userDecidedFame.shortName
+    } ${userDecidedFame.emoji}) ${credits} <:Credits:1355573284149661866>\n`;
+  }
+
+  if (newCredits) {
+    description += `**${rankDisplay} - ${
+      user.member ? user.member.displayName : user.username
+    }** ${creditsChange}\n`;
+  }
 
   return {
     userDescription: description,
