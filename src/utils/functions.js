@@ -247,6 +247,12 @@ exports.parseUserInfoToStr = async ({
 
   let isPrivateMemberInServer = "❌";
 
+  let flagEmoji = user.allianceLocation
+    ? `flag_${user.allianceLocation.toLowerCase()}`
+    : "";
+
+  if (flag) flagEmoji = flag;
+
   if (isPrivate) {
     if (!markType) {
       const d = await Users.findOne({
@@ -272,7 +278,7 @@ exports.parseUserInfoToStr = async ({
 
   description += `**${rankDisplay} - ${
     user.member ? user.member.displayName : user.username
-  }** ${isPrivate ? isPrivateMemberInServer : ""}${!newCredits ? (flag ?? "") : ""}${newCredits ? creditsChange : ""} ${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
+  }** ${isPrivate ? isPrivateMemberInServer : ""}${!newCredits ? flagEmoji : ""}${newCredits ? creditsChange : ""} ${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
     userDecidedFame.shortName
   } ${userDecidedFame.emoji}) ${credits}${!newCredits ? " <:Credits:1355573284149661866>" : ""}\n`;
 
