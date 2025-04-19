@@ -134,7 +134,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
 
       await i.channel.send({
         content: `Retried ${retryResult.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
-          retryResult.failedUsers.join(", ") || "None"
+          retryResult.failedUserNames.join(", ") || "None"
         }`,
       });
     });
