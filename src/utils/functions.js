@@ -248,7 +248,7 @@ exports.parseUserInfoToStr = async ({
   let isPrivateMemberInServer = "❌";
 
   let flagEmoji = user.allianceLocation
-    ? `flag_${user.allianceLocation.toLowerCase()}`
+    ? `:flag_${user.allianceLocation.toLowerCase()}:`
     : "";
 
   if (flag) flagEmoji = flag;
