@@ -100,10 +100,6 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
   if (users.length === 0)
     throw new Error("No user found in database, start saving your info.");
 
-  let failedUsers = [];
-
-  let successfulUserCount = 0;
-
   const result = await refreshUsersBatch(users, dailyRefresh);
 
   if (interaction) {
@@ -116,8 +112,8 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
     );
 
     const m = await interaction.channel.send({
-      content: `Refreshed data for ${successfulUserCount} users, failed users: ${
-        failedUsers.join(", ") || "None"
+      content: `Refreshed data for ${result.successfulCount} users, failed users: ${
+        result.failedUserNames.join(", ") || "None"
       }`,
       components: [row],
     });
@@ -131,10 +127,13 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
     collector.on("collect", async (i) => {
       await i.update({ components: [] });
 
-      const retryResult = await refreshUsersBatch(failedUsers, dailyRefresh);
+      const retryResult = await refreshUsersBatch(
+        result.failedUsers,
+        dailyRefresh
+      );
 
       await i.channel.send({
-        content: `Retried ${failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
+        content: `Retried ${retryResult.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
           retryResult.failedUsers.join(", ") || "None"
         }`,
       });
