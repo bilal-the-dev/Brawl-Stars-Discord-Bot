@@ -141,7 +141,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, refreshType } = {}) => {
       const retryResult = await refreshUsersBatch(result.failedUsers); // in interaction, we will never have daily/ weekly/monthly refresh
 
       await i.channel.send({
-        content: `Retried ${retryResult.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
+        content: `Retried ${result.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
           retryResult.failedUserNames.join(", ") || "None"
         }`,
       });
