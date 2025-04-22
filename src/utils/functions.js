@@ -3,6 +3,7 @@ const {
   ButtonBuilder,
   ButtonStyle,
   EmbedBuilder,
+  MessageFlags,
 } = require("discord.js");
 const Users = require("../models/Users");
 const { getBrawtStarsUserInfoByTag } = require("./api");
@@ -154,7 +155,8 @@ exports.generateLeaderboardData = async (
   isPrivate,
   newCreditsType
 ) => {
-  if (interaction) await interaction.deferReply();
+  if (interaction)
+    await interaction.deferReply({ flags: MessageFlags.Ephemeral });
 
   let secondIsPrivate = isPrivate;
 
