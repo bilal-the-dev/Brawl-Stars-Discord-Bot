@@ -36,7 +36,7 @@ client.on("ready", async (readyClient) => {
     onTick: async function () {
       try {
         console.log("Running leaderboard time");
-        await refreshBrawlStarsInfo({ dailyRefresh: true });
+        await refreshBrawlStarsInfo({ refreshType: "daily" });
         const guild = client.guilds.cache.get(GUILD_ID);
 
         const embeds = await generateLeaderboardData(guild, null, false);
@@ -51,6 +51,35 @@ client.on("ready", async (readyClient) => {
     start: true,
     timeZone: "Europe/Rome",
   });
+
+  CronJob.from({
+    cronTime: "0 0 0 * * 1", // Every Monday at 12:00 AM
+    onTick: async function () {
+      try {
+        console.log("Running weekly leaderboard time");
+        await refreshBrawlStarsInfo({ refreshType: "weekly" });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    start: true,
+    timeZone: "Europe/Rome",
+  });
+
+  CronJob.from({
+    cronTime: "0 0 0 1 * *", // 1st of every month at 12:00 AM
+    onTick: async function () {
+      try {
+        console.log("Running monthly leaderboard time");
+        await refreshBrawlStarsInfo({ refreshType: "monthly" });
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    start: true,
+    timeZone: "Europe/Rome",
+  });
+
   await mongoose.connect(MONGO_URI);
 
   readyClient.user.setPresence({

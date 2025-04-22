@@ -14,7 +14,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
   const { options } = interaction;
 
   const brawlStarsTag = options.getString("tag").replace("#", "");
-  const name = options.getString("name");
+  const userInputName = options.getString("name");
   const superCellId = options.getString("supercell_id");
 
   // since public info is similar to private now, i think no need to validate anymore?
@@ -30,8 +30,10 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
   const data = await getBrawtStarsUserInfoByTag(brawlStarsTag);
 
   const {
-    response: { Stats, Name, Alliance },
+    result: { stats, name, alliance },
   } = data;
+
+  const credits = stats.find((s) => s.stat_id === 20).value;
 
   const query = {
     brawlStarsTag,
@@ -48,24 +50,27 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
   const userDoc = await Users.findOneAndUpdate(
     query,
     {
-      username: name,
+      username: userInputName,
       superCellId,
       private: isPrivate,
       brawlStarsTag,
-      brawlStarsUsername: Name,
-      trophies: Stats["3"],
-      credits: Stats["20"],
-      allianceLocation: Alliance?.RegionName,
+      brawlStarsUsername: name,
+      credits,
+      allianceLocation: alliance?.region,
     },
     { upsert: true, new: true }
   );
 
   if (!oldDoc) {
-    console.log("New user created with credits:", Stats["20"]);
+    console.log("New user created with credits:", credits);
 
     await userDoc.updateOne({
-      oldCredits: Stats["20"],
-      newRefreshedCredits: Stats["20"],
+      dailyOldCredits: credits,
+      weeklyOldCredits: credits,
+      monthlyOldCredits: credits,
+      dailyRefreshedCredits: credits,
+      weeklyRefreshedCredits: credits,
+      monthlyRefreshedCredits: credits,
     });
   }
   await interaction.editReply({
@@ -73,10 +78,10 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
   });
 };
 
-exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
+exports.refreshBrawlStarsInfo = async ({ interaction, refreshType } = {}) => {
   if (interaction)
     await interaction.reply(
-      "Refreshing... Will send a message when completed! Takes 10 seconds approx for each user."
+      "Refreshing... Will send a message when completed!"
     );
 
   let isPrivate, secondIsPrivate;
@@ -100,7 +105,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
   if (users.length === 0)
     throw new Error("No user found in database, start saving your info.");
 
-  const result = await refreshUsersBatch(users, dailyRefresh);
+  const result = await refreshUsersBatch(users, refreshType);
 
   if (interaction) {
     const row = new ActionRowBuilder().addComponents(
@@ -121,16 +126,13 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
     const collector = m.createMessageComponentCollector({
       filter: (i) =>
         i.customId === "refresh_failed" && i.user.id === interaction.user.id,
-      time: 1000 * 60 * 3,
+      time: 1000 * 60 * 60,
     });
 
     collector.on("collect", async (i) => {
       await i.update({ components: [] });
 
-      const retryResult = await refreshUsersBatch(
-        result.failedUsers,
-        dailyRefresh
-      );
+      const retryResult = await refreshUsersBatch(result.failedUsers); // in interaction, we will never have daily/ weekly/monthly refresh
 
       await i.channel.send({
         content: `Retried ${retryResult.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
@@ -145,7 +147,7 @@ exports.generateLeaderboardData = async (
   guild,
   interaction,
   isPrivate,
-  newCredits
+  newCreditsType
 ) => {
   if (interaction) await interaction.deferReply();
 
@@ -182,7 +184,7 @@ exports.generateLeaderboardData = async (
       description,
       isPrivate,
       lastFame,
-      newCredits,
+      newCreditsType,
     });
 
     lastFame = newLastFame;
@@ -226,7 +228,7 @@ exports.parseUserInfoToStr = async ({
   postion,
   lastFame,
   isPrivate,
-  newCredits,
+  newCreditsType,
 }) => {
   let userDecidedFame = {};
   let rankDisplay;
@@ -272,13 +274,20 @@ exports.parseUserInfoToStr = async ({
 
   let creditsChange;
 
-  if (newCredits) {
-    const diff = user.newRefreshedCredits - user.oldCredits;
+  if (newCreditsType) {
+    const diff =
+      user[`${newCreditsType}RefreshedCredits`] -
+      user[`${newCreditsType}OldCredits`];
 
-    creditsChange = `${diff >= 0 ? "📈" : "📉"} ${Math.abs(diff)} <:Credits:1355573284149661866>`;
+    let changeEmoji;
+
+    if (diff === 0) changeEmoji = "➖";
+    if (diff > 0) changeEmoji = "📈";
+    if (diff < 0) changeEmoji = "📉";
+    creditsChange = `${changeEmoji} ${Math.abs(diff)} <:Credits:1355573284149661866>`;
   }
 
-  if (!newCredits) {
+  if (!newCreditsType) {
     description += `**${rankDisplay} - ${
       user.member ? user.member.displayName : user.username
     }** ${isPrivate ? isPrivateMemberInServer : ""}${flagEmoji ?? ""} ${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
@@ -286,7 +295,7 @@ exports.parseUserInfoToStr = async ({
     } ${userDecidedFame.emoji}) ${credits} <:Credits:1355573284149661866>\n`;
   }
 
-  if (newCredits) {
+  if (newCreditsType) {
     description += `**${rankDisplay} - ${
       user.member ? user.member.displayName : user.username
     }** ${creditsChange}\n`;
@@ -298,7 +307,7 @@ exports.parseUserInfoToStr = async ({
   };
 };
 
-async function refreshUsersBatch(users, dailyRefresh = false) {
+async function refreshUsersBatch(users, refreshType) {
   let failedUsers = [];
   let failedUserNames = [];
   let successfulCount = 0;
@@ -307,21 +316,24 @@ async function refreshUsersBatch(users, dailyRefresh = false) {
     try {
       const data = await getBrawtStarsUserInfoByTag(user.brawlStarsTag);
       const {
-        response: { Stats, Name, Alliance },
+        result: { stats, name, alliance },
       } = data;
 
+      const credits = stats.find((s) => s.stat_id === 20).value;
+
       await user.updateOne({
-        trophies: Stats["3"],
-        brawlStarsUsername: Name,
-        credits: Stats["20"],
-        ...(dailyRefresh && { oldCredits: user.newRefreshedCredits }),
-        ...(dailyRefresh && { newRefreshedCredits: Stats["20"] }),
-        allianceLocation: Alliance?.RegionName,
+        brawlStarsUsername: name,
+        credits: credits,
+        ...(refreshType && {
+          [`${refreshType}OldCredits`]: user[`${refreshType}RefreshedCredits`],
+        }),
+        ...(refreshType && { [`${refreshType}RefreshedCredits`]: credits }),
+        allianceLocation: alliance?.region,
       });
 
       successfulCount++;
 
-      await new Promise((res) => setTimeout(res, 1000 * 10));
+      // await new Promise((res) => setTimeout(res, 1000 * 10)); // no need anymore with new api
     } catch (error) {
       console.log(error);
       failedUsers.push(user);

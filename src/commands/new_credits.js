@@ -7,11 +7,12 @@ module.exports = {
   description: "View new credits for all users!",
   async callback({ interaction }) {
     try {
+      const isPrivate = false;
       await generateLeaderboardData(
         interaction.guild,
         interaction,
-        false,
-        true
+        isPrivate,
+        interaction.options.getString("type") // new credits type
       );
     } catch (error) {
       handleInteractionError(interaction, error);
@@ -20,4 +21,17 @@ module.exports = {
 
   guildOnly: true,
   type: CommandType.SLASH,
+  options: [
+    {
+      name: "type",
+      description: "tpye of new credits",
+      type: 3,
+      required: true,
+      choices: [
+        { name: "Daily", value: "daily" },
+        { name: "Weekly", value: "weekly" },
+        { name: "Monthly", value: "monthly" },
+      ],
+    },
+  ],
 };
