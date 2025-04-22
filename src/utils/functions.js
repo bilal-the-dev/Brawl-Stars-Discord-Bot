@@ -7,6 +7,11 @@ const {
 const Users = require("../models/Users");
 const { getBrawtStarsUserInfoByTag } = require("./api");
 const config = require("./../../config.json");
+const {
+  pagination,
+  ButtonTypes,
+  ButtonStyles,
+} = require("@devraelfreeze/discordjs-pagination");
 
 exports.saveBrawlInfo = async (interaction, isPrivate) => {
   await interaction.deferReply();
@@ -164,8 +169,6 @@ exports.generateLeaderboardData = async (
   if (users.length === 0)
     throw new Error("No user found in database, start saving your info.");
 
-  const content = "Here are the top players sorted by credits!\n\n";
-
   let description = "";
   const embeds = [];
 
@@ -210,13 +213,28 @@ exports.generateLeaderboardData = async (
   }
 
   if (interaction) {
-    await interaction.editReply({ content, embeds: [embeds[0]] });
-
-    if (embeds.length >= 1) {
-      for (const embed of embeds.slice(1)) {
-        await interaction.channel.send({ embeds: [embed] });
-      }
-    }
+    await pagination({
+      embeds /** Array of embeds objects */,
+      author: interaction.user,
+      interaction: interaction,
+      ephemeral: true,
+      time: 1000 * 60 * 5 /** 40 seconds */,
+      disableButtons: true /** Remove buttons after timeout */,
+      fastSkip: false,
+      pageTravel: false,
+      buttons: [
+        {
+          type: ButtonTypes.previous,
+          label: "Previous",
+          style: ButtonStyles.Danger,
+        },
+        {
+          type: ButtonTypes.next,
+          label: "Next",
+          style: ButtonStyles.Success,
+        },
+      ],
+    });
   }
 
   return embeds;
