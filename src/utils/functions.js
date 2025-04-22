@@ -332,7 +332,7 @@ async function refreshUsersBatch(users, refreshType) {
   let failedUserNames = [];
   let successfulCount = 0;
 
-  const promises = users.map(async (user) => {
+  for (const user of users) {
     try {
       const data = await getBrawtStarsUserInfoByTag(user.brawlStarsTag);
       const {
@@ -359,9 +359,7 @@ async function refreshUsersBatch(users, refreshType) {
       failedUsers.push(user);
       failedUserNames.push(user.userId ? `<@${user.userId}>` : user.username);
     }
-  });
-
-  await Promise.allSettled(promises);
+  }
 
   return {
     successfulCount,
