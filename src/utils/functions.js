@@ -203,7 +203,7 @@ exports.generateLeaderboardData = async (
 
     // make dynamic embeds to avoid 4096 max desc length
     if (
-      description.length >= (isPrivate ? 2000 : 3500) ||
+      description.length >= (isPrivate ? 2000 : 3000) ||
       index === users.length - 1
     ) {
       const embed = new EmbedBuilder()
