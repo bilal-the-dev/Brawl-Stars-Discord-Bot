@@ -74,9 +74,11 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
       dailyOldCredits: credits,
       weeklyOldCredits: credits,
       monthlyOldCredits: credits,
+      brawlPassOldCredits: credits,
       dailyRefreshedCredits: credits,
       weeklyRefreshedCredits: credits,
       monthlyRefreshedCredits: credits,
+      brawlPassRefreshedCredits: credits,
     });
   }
   await interaction.editReply({
@@ -138,7 +140,10 @@ exports.refreshBrawlStarsInfo = async ({ interaction, refreshType } = {}) => {
     collector.on("collect", async (i) => {
       await i.update({ components: [] });
 
-      const retryResult = await refreshUsersBatch(result.failedUsers); // in interaction, we will never have daily/ weekly/monthly refresh
+      const retryResult = await refreshUsersBatch(
+        result.failedUsers,
+        refreshType
+      ); // for brawl season reset we wanna do the refresh type
 
       await i.channel.send({
         content: `Retried ${result.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
