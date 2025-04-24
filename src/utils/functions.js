@@ -125,9 +125,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, refreshType } = {}) => {
     );
 
     const m = await interaction.channel.send({
-      content: `Refreshed data for ${result.successfulCount} users, failed users: ${
-        result.failedUserNames.join(", ") || "None"
-      }`,
+      content: `Refreshed data for ${result.successfulCount} users, Failed users: ${result.failedUserNames.length}`,
       components: [row],
     });
 
@@ -147,7 +145,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, refreshType } = {}) => {
 
       await i.channel.send({
         content: `Retried ${result.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
-          retryResult.failedUserNames.join(", ") || "None"
+          retryResult.failedUserNames.length
         }`,
       });
     });
@@ -358,7 +356,7 @@ async function refreshUsersBatch(users, refreshType) {
 
       successfulCount++;
 
-      // await new Promise((res) => setTimeout(res, 1000 * 10)); // no need anymore with new api
+      await new Promise((res) => setTimeout(res, 1000 * 2)); // no need anymore with new api - actually lets add 2 secs
     } catch (error) {
       console.log(error);
       failedUsers.push(user);
