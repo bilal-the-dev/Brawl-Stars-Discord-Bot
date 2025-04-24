@@ -112,7 +112,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
     );
 
     const m = await interaction.channel.send({
-      content: `Refreshed data for ${result.successfulCount} users`,
+      content: `Refreshed data for ${result.successfulCount} users. Failed Users: ${result.failedUsers.length}`,
       components: [row],
     });
 
@@ -131,7 +131,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
       );
 
       await i.channel.send({
-        content: `Retried ${retryResult.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}`,
+        content: `Retried ${result.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}. Failed Users: ${retryResult.failedUsers.length}`,
       });
     });
   }
