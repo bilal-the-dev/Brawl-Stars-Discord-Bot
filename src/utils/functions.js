@@ -112,9 +112,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
     );
 
     const m = await interaction.channel.send({
-      content: `Refreshed data for ${result.successfulCount} users, failed users: ${
-        result.failedUserNames.join(", ") || "None"
-      }`,
+      content: `Refreshed data for ${result.successfulCount} users`,
       components: [row],
     });
 
@@ -133,9 +131,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, dailyRefresh } = {}) => {
       );
 
       await i.channel.send({
-        content: `Retried ${retryResult.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
-          retryResult.failedUserNames.join(", ") || "None"
-        }`,
+        content: `Retried ${retryResult.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}`,
       });
     });
   }
