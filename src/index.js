@@ -32,7 +32,7 @@ client.on("ready", async (readyClient) => {
   console.log(`Fetched ${members?.size ?? 0} for guild ${guild.name}`);
 
   CronJob.from({
-    cronTime: "0 50 23 * * *",
+    cronTime: "0 0 */6 * * *",
     onTick: async function () {
       try {
         console.log("Running leaderboard time");

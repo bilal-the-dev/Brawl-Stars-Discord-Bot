@@ -13,6 +13,7 @@ const {
   ButtonTypes,
   ButtonStyles,
 } = require("@devraelfreeze/discordjs-pagination");
+const { flagEmojiToCountryCode } = require("./parse");
 
 exports.saveBrawlInfo = async (interaction, isPrivate) => {
   await interaction.deferReply();
@@ -144,9 +145,7 @@ exports.refreshBrawlStarsInfo = async ({ interaction, refreshType } = {}) => {
       ); // for brawl season reset we wanna do the refresh type
 
       await i.channel.send({
-        content: `Retried ${result.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${
-          retryResult.failedUserNames.length
-        }`,
+        content: `Retried ${result.failedUsers.length} users.\nSuccess: ${retryResult.successfulCount}, Failed: ${retryResult.failedUserNames.length}`,
       });
     });
   }
@@ -156,7 +155,8 @@ exports.generateLeaderboardData = async (
   guild,
   interaction,
   isPrivate,
-  newCreditsType
+  newCreditsType,
+  flagFilter
 ) => {
   if (interaction)
     await interaction.deferReply({ flags: MessageFlags.Ephemeral });
@@ -165,13 +165,27 @@ exports.generateLeaderboardData = async (
 
   if (!isPrivate) secondIsPrivate = undefined;
 
+  const filteredUsers = [];
+
   const users = await Users.find({
     $or: [{ private: isPrivate }, { private: secondIsPrivate }],
   })
     .sort({ credits: "descending" })
     .lean();
 
-  if (users.length === 0)
+  if (flagFilter) {
+    users.forEach((user) => {
+      const matchAgainst = user.flag
+        ? flagEmojiToCountryCode(user.flag)
+        : user.allianceLocation?.toUpperCase(); // already upper but yeah
+
+      if (matchAgainst === flagFilter) filteredUsers.push(user);
+    });
+  }
+
+  if (!flagFilter) filteredUsers.push(...users);
+
+  if (filteredUsers.length === 0)
     throw new Error("No user found in database, start saving your info.");
 
   let description = "";
@@ -179,13 +193,13 @@ exports.generateLeaderboardData = async (
 
   let lastFame = null;
 
-  for (const user of users) {
+  for (const user of filteredUsers) {
     if (user.userId)
       // they dont have user id for private so this "if" will never happen
       user.member = await guild.members.fetch(user.userId).catch(console.error);
   }
 
-  for (const [index, user] of users.entries()) {
+  for (const [index, user] of filteredUsers.entries()) {
     const { userDescription, newLastFame } = await this.parseUserInfoToStr({
       user,
       postion: index + 1,
@@ -202,7 +216,7 @@ exports.generateLeaderboardData = async (
     // make dynamic embeds to avoid 4096 max desc length
     if (
       description.length >= (isPrivate ? 2000 : 3000) ||
-      index === users.length - 1
+      index === filteredUsers.length - 1
     ) {
       const embed = new EmbedBuilder()
         .setTitle("🏆 Brawl Stars Leaderboard")
@@ -307,15 +321,19 @@ exports.parseUserInfoToStr = async ({
     if (diff === 0) changeEmoji = "➖";
     if (diff > 0) changeEmoji = "📈";
     if (diff < 0) changeEmoji = "📉";
-    creditsChange = `${changeEmoji} ${Math.abs(diff)} <:Credits:1355573284149661866>`;
+    creditsChange = `${changeEmoji} ${Math.abs(
+      diff
+    )} <:Credits:1355573284149661866>`;
   }
 
   if (!newCreditsType) {
     description += `**${rankDisplay} - ${
       user.member ? user.member.displayName : user.username
-    }** ${isPrivate ? isPrivateMemberInServer : ""}${flagEmoji ?? ""} ${user.superCellId ? `(${user.superCellId})` : ""}(#${brawlStarsTag}) (${
-      userDecidedFame.shortName
-    } ${userDecidedFame.emoji}) ${credits} <:Credits:1355573284149661866>\n`;
+    }** ${isPrivate ? isPrivateMemberInServer : ""}${flagEmoji ?? ""} ${
+      user.superCellId ? `(${user.superCellId})` : ""
+    }(#${brawlStarsTag}) (${userDecidedFame.shortName} ${
+      userDecidedFame.emoji
+    }) ${credits} <:Credits:1355573284149661866>\n`;
   }
 
   if (newCreditsType) {
