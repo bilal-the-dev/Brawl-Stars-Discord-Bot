@@ -40,7 +40,7 @@ exports.saveBrawlInfo = async (interaction, isPrivate) => {
     result: { stats, name, alliance },
   } = data;
 
-  const credits = stats.find((s) => s.stat_id === 20).value;
+  const credits = stats.find((s) => s.id === 20).value;
 
   const query = {
     brawlStarsTag,
@@ -360,7 +360,7 @@ async function refreshUsersBatch(users, refreshType) {
         result: { stats, name, alliance },
       } = data;
 
-      const credits = stats.find((s) => s.stat_id === 20).value;
+      const credits = stats.find((s) => s.id === 20).value;
 
       await user.updateOne({
         brawlStarsUsername: name,
